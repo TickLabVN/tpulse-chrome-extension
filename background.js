@@ -7,6 +7,8 @@
  */
 
 const APP_NAME = "com.ticklab.tpulse";
+const port = chrome.runtime.connectNative(APP_NAME);
+
 /**
  * 
  * @param {ChromeTab} tab 
@@ -20,9 +22,7 @@ function tabHandler(tab) {
         url: tab.url
     }
 
-    // console.log(tabInformation);
-    chrome.runtime.sendNativeMessage(APP_NAME, tabInformation)
-        .catch((err) => console.error(err));
+    port.postMessage(tabInformation);
 }
 
 function watch() {
