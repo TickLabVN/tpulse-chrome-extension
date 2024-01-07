@@ -4,7 +4,9 @@
   "description": "Collect metrics from browser usage",
   "version": "0.0.1",
   "action": {
-    "default_icon": "public/clock.png",
+    "default_icon": {
+      "128": "clock.png"
+    },
     "default_popup": "src/popup.html"
   },
   "background": {
