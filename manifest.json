@@ -1,18 +1,21 @@
 {
-    "manifest_version": 3,
-    "name": "TPulse Extensions",
-    "description": "Collect metrics from browser usage",
-    "version": "0.0.1",
-    "action": {
-        "default_icon": "clock.png"
+  "manifest_version": 3,
+  "name": "TPulse Extensions",
+  "description": "Collect metrics from browser usage",
+  "version": "0.0.1",
+  "action": {
+    "default_icon": {
+      "128": "clock.png"
     },
-    "background": {
-        "service_worker": "background.js"
-    },
-    "permissions": [
-        "tabs",
-        "background",
-        "nativeMessaging",
-        "webNavigation"
-    ]
+    "default_popup": "src/popup.html"
+  },
+  "background": {
+    "service_worker": "src/background.ts"
+  },
+  "permissions": [
+    "tabs",
+    "background",
+    "nativeMessaging",
+    "webNavigation"
+  ]
 }
