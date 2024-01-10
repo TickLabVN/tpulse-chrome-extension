@@ -8,7 +8,7 @@
 #### 1. Build
 - `yarn`: Install dependencies.
 - `yarn build`: Create `/dist` folder.
-- `cd proxy && cargo build`: Create file binary `target/debug/proxy` to process data sent from extension.
+- `cd proxy && cargo build --release`: Create file binary `target/release/proxy` to process data sent from extension.
 #### 2. Load extension
 - Run command `google-chrome` on terminal to open Chrome browser.
 - Enter `chrome://extensions/` and switch to **Developer mode**.
