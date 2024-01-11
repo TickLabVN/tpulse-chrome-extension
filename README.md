@@ -26,7 +26,7 @@
     {
         "name": "com.ticklab.tpulse",
         "description": "tpulse",
-        "path": "<path>/tpulse-chrome-extension/proxy/target/debug/proxy",
+        "path": "<path>/tpulse-chrome-extension/proxy/target/release/proxy",
         "type": "stdio",
         "allowed_origins": ["chrome-extension://<ID-of-extension-in-step-2>/"]
     }
