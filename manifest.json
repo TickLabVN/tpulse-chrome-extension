@@ -12,10 +12,11 @@
   "background": {
     "service_worker": "src/background.ts"
   },
-  "permissions": [
-    "tabs",
-    "background",
-    "nativeMessaging",
-    "webNavigation"
-  ]
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["src/contentScript.ts"]
+    }
+  ],
+  "permissions": ["tabs", "background", "nativeMessaging", "webNavigation"]
 }
