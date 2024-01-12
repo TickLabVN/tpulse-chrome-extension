@@ -42,7 +42,7 @@ jobs:
   build-proxy:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     env:
       BINARY_BASE_NAME: tpulse-proxy
@@ -135,6 +135,7 @@ jobs:
 
       - name: Unzip artifacts
         run: |
+          ls -lh
           unzip -q -o linux.zip
           unzip -q -o mac.zip
           unzip -q -o windows.zip
@@ -145,6 +146,3 @@ jobs:
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       #   run: yarn semantic-release
-
-
-  
