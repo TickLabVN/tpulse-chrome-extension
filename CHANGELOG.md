@@ -1,3 +1,10 @@
+# [1.0.0-beta.2](https://github.com/TickLabVN/tpulse-browser-extension/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2024-01-12)
+
+
+### Bug Fixes
+
+* change release asset names ([b2af026](https://github.com/TickLabVN/tpulse-browser-extension/commit/b2af02642e0e5bd49d091647061df533e5f37538))
+
 # 1.0.0-beta.1 (2024-01-12)
 
 
