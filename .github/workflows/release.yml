@@ -135,11 +135,11 @@ jobs:
 
       - name: Unzip artifacts
         run: |
-          ls -lh
-          unzip -q -o linux.zip
-          unzip -q -o mac.zip
-          unzip -q -o windows.zip
-          rm -f linux.zip mac.zip windows.zip
+          ls
+          unzip linux.zip
+          # unzip mac.zip
+          # unzip windows.zip
+          # rm -f linux.zip mac.zip windows.zip
           ls -lh
 
       # - name: Release
