@@ -15,12 +15,12 @@
       {
         "assets": [
           {
-            "path": "*_linux*",
-            "label": "Distribution"
+            "path": "binaries/*",
+            "label": "Prebuilt binaries"
           },
           {
-            "path": "dist/*.js.map",
-            "label": "Source map"
+            "path": "tpulse-chrome-extension.zip",
+            "label": "Extension ZIP file"
           }
         ]
       }
