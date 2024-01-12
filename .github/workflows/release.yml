@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.extension-build.outputs.REPO_NAME }}
+          name: ${{ steps.extension-build.outputs.REPO_NAME }}.zip
           path: dist
           retention-days: 1
           compression-level: 9 # maximum compression
@@ -82,7 +82,7 @@ jobs:
       - if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.build-proxy-unix.outputs.DISTRO }}
+          name: ${{ steps.build-proxy-unix.outputs.DISTRO }}.zip
           path: ${{ steps.build-proxy-unix.outputs.BINARY_NAME }}
           retention-days: 1
           compression-level: 0
@@ -105,7 +105,7 @@ jobs:
       - if: ${{ matrix.os == 'windows-latest' }}
         uses: actions/upload-artifact@v4
         with:
-          name: windows
+          name: windows.zip
           retention-days: 1
           path: ${{ steps.build-proxy-windows.outputs.BINARY_NAME }}
           compression-level: 0
