@@ -71,7 +71,7 @@ jobs:
 
           rustup target add $BUILD_TARGET
           cargo build --release --target=$BUILD_TARGET --manifest-path src-proxy/Cargo.toml
-          ls src-proxy/target/release/$BUILD_TARGET
+          ls src-proxy/target/$BUILD_TARGET/release
 
           BINARY_NAME="${{ env.BINARY_BASE_NAME }}_$DISTRO"
           cp src-proxy/target/$BUILD_TARGET/release/proxy $BINARY_NAME
@@ -95,7 +95,7 @@ jobs:
           rustup target add $BUILD_TARGET
           
           cargo build --release --target=$BUILD_TARGET --manifest-path src-proxy/Cargo.toml
-          ls src-proxy/target/release/$BUILD_TARGET
+          ls src-proxy/target/$BUILD_TARGET/release
 
           $BINARY_NAME = "${{ env.BINARY_BASE_NAME }}_windows.exe"
           Copy-Item -Path "src-proxy\target\$BUILD_TARGET\release\proxy" -Destination $BINARY_NAME
