@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.extension-build.outputs.REPO_NAME }}.zip
+          name: ${{ steps.extension-build.outputs.REPO_NAME }}
           path: dist
           retention-days: 1
           compression-level: 9 # maximum compression
@@ -82,7 +82,7 @@ jobs:
       - if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.build-proxy-unix.outputs.DISTRO }}.zip
+          name: ${{ steps.build-proxy-unix.outputs.DISTRO }}
           path: ${{ steps.build-proxy-unix.outputs.BINARY_NAME }}
           retention-days: 1
           compression-level: 0
@@ -105,7 +105,7 @@ jobs:
       - if: ${{ matrix.os == 'windows-latest' }}
         uses: actions/upload-artifact@v4
         with:
-          name: windows.zip
+          name: windows
           retention-days: 1
           path: ${{ steps.build-proxy-windows.outputs.BINARY_NAME }}
           compression-level: 0
@@ -115,14 +115,6 @@ jobs:
     needs: [build-extension, build-proxy]
     runs-on: ubuntu-latest
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-
-      - name: Unzip artifacts
-        run: |
-          ls . | grep '.zip'
-          unzip linux.zip
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -141,13 +133,15 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          path: ~/artifacts
 
       - name: Unzip artifacts
         run: |
-          ls -l artifacts  # Check file permissions and names
-          unzip artifacts/linux.zip -d assets
-          ls -l assets  # Check file permissions and names
+          ls -l .  # Check file permissions and names
+          unzip linux -d binaries
+          unzip mac -d binaries
+          unzip windows -d binaries
+          ls -l binaries # Check file permissions and names
 
       # - name: Release
       #   env:
