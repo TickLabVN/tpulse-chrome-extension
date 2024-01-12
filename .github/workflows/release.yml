@@ -54,8 +54,9 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Build
-        id: build-proxy
+      - name: Build on ${{ matrix.os }}
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
+        id: build-proxy-unix
         run: |
           cargo build --release --manifest-path src-proxy/Cargo.toml
 
@@ -74,8 +75,33 @@ jobs:
       - if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.build-proxy.outputs.BINARY_NAME }}
-          path: src-proxy/target/release/${{ steps.build-proxy.outputs.SOURCE_BINARY_PATH }}
+          name: ${{ steps.build-proxy-unix.outputs.BINARY_NAME }}
+          path: src-proxy/target/release/${{ steps.build-proxy-unix.outputs.SOURCE_BINARY_PATH }}
+          compression-level: 9 # maximum compression
+
+      - name: Build on ${{ matrix.os }}
+        id: build-proxy-windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          cargo build --release --manifest-path src-proxy/Cargo.toml
+
+          $OS_NAME = (echo "${{ matrix.os }}").Split("-")[0]
+          $BINARY_NAME = "${{ env.BINARY_BASE_NAME }}-$OS_NAME"
+          $SOURCE_BINARY_PATH = "proxy"
+
+          if ($OS_NAME -eq "windows") {
+            $SOURCE_BINARY_PATH += ".exe"
+            $BINARY_NAME += ".exe"
+          }
+
+          echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_OUTPUT
+          echo "SOURCE_BINARY_PATH=$SOURCE_BINARY_PATH" >> $GITHUB_OUTPUT
+
+      - if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.build-proxy-windows.outputs.BINARY_NAME }}
+          path: src-proxy/target/release/${{ steps.build-proxy-windows.outputs.SOURCE_BINARY_PATH }}
           compression-level: 9 # maximum compression
 
   release:
@@ -94,6 +120,7 @@ jobs:
         
       - name: Display structure of downloaded files
         run: ls -R
+
   #     - name: Setup Node.js
   #       uses: actions/setup-node@v3
   #       with:
