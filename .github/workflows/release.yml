@@ -115,6 +115,14 @@ jobs:
     needs: [build-extension, build-proxy]
     runs-on: ubuntu-latest
     steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Unzip artifacts
+        run: |
+          ls . | grep '.zip'
+          unzip linux.zip
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -132,15 +140,14 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
       - name: Unzip artifacts
         run: |
-          ls . | grep '.zip'
-          unzip $(pwd)/linux.zip
-          # unzip ./mac.zip
-          # unzip ./windows.zip
-          rm -f *.zip *.zip *.zip
-          ls -lh
+          ls -l artifacts  # Check file permissions and names
+          unzip artifacts/linux.zip -d assets
+          ls -l assets  # Check file permissions and names
 
       # - name: Release
       #   env:
