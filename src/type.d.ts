@@ -3,9 +3,16 @@ type VideoStatus = {
   startTime?: Time;
 };
 
+/**
+ * The MessageTypePrefix is a unique identifier specific to the TicklabVN Tpulse extension.
+ */
+type MessageTypePrefix = "ticklabvn.tpulse.";
+
+type VideoStatusPayload = Record<string, string | number | boolean>;
+
 type BrowserMessage = {
-  type: "NEW" | "UPDATE_VIDEO_STATUS";
-  value?: string | Record<string, string | number>;
+  type: `${MessageTypePrefix}${"NEW_VIDEO" | "UPDATE_VIDEO_STATUS"}`;
+  payload?: VideoStatusPayload;
 };
 
 type ChromeTab = {
@@ -16,9 +23,7 @@ type ChromeTab = {
   tabId?: number;
 };
 
-type VideoStatusMessage = BrowserMessage & { tabId?: number };
-
-type BinaryMessage = {
+type VideoStatusPayloadWithTabId = VideoStatusPayload & { tabId?: number };
+type BinaryMessage = (VideoStatusPayloadWithTabId | ChromeTab) & {
   type: "ChromeTab" | "VideoStatus";
-  value: ChromeTab | VideoStatusMessage;
 };

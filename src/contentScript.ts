@@ -15,7 +15,11 @@ const updateStatus = (event: Event) => {
     videoStatus.startTime = Math.floor(Date.now() / 1000);
     //send data to background
     try {
-      browser.runtime.sendMessage({ type: "UPDATE_VIDEO_STATUS", videoStatus });
+      const message: BrowserMessage = {
+        type: "ticklabvn.tpulse.UPDATE_VIDEO_STATUS",
+        payload: videoStatus,
+      };
+      browser.runtime.sendMessage(message);
     } catch (e) {
       console.error(e);
     }
@@ -32,7 +36,11 @@ const updateStatus = (event: Event) => {
   videoStatus.startTime = Math.floor(Date.now() / 1000);
   //send data to background
   try {
-    browser.runtime.sendMessage({ type: "UPDATE_VIDEO_STATUS", videoStatus });
+    const message: BrowserMessage = {
+      type: "ticklabvn.tpulse.UPDATE_VIDEO_STATUS",
+      payload: videoStatus,
+    };
+    browser.runtime.sendMessage(message);
   } catch (e) {
     console.error(e);
   }
@@ -61,7 +69,11 @@ const setupPlayerEventListeners = () => {
 
     //send data to background
     try {
-      browser.runtime.sendMessage({ type: "UPDATE_VIDEO_STATUS", videoStatus });
+      const message: BrowserMessage = {
+        type: "ticklabvn.tpulse.UPDATE_VIDEO_STATUS",
+        payload: videoStatus,
+      };
+      browser.runtime.sendMessage(message);
     } catch (e) {
       console.error(e);
     }
@@ -71,7 +83,7 @@ const setupPlayerEventListeners = () => {
 browser.runtime.onMessage.addListener((obj) => {
   const { type } = obj;
 
-  if (type === "NEW") {
+  if (type === "ticklabvn.tpulse.NEW_VIDEO") {
     setupPlayerEventListeners();
   }
 });

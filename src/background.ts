@@ -30,7 +30,7 @@ function watch() {
     const tabId = activeInfo.tabId;
     getTabDetails(tabId)
       .then((tab) => {
-        const message: BinaryMessage = { type: "ChromeTab", value: tab };
+        const message: BinaryMessage = { type: "ChromeTab", ...tab };
         port.postMessage(message);
       })
       .catch((error) => console.error("Error getting tab information:", error));
@@ -41,7 +41,7 @@ function watch() {
       const tabId = details.tabId;
       getTabDetails(tabId)
         .then((tab) => {
-          const message: BinaryMessage = { type: "ChromeTab", value: tab };
+          const message: BinaryMessage = { type: "ChromeTab", ...tab };
           port.postMessage(message);
         })
         .catch((error) =>
@@ -60,7 +60,7 @@ function watch() {
       tab.url.startsWith("http")
     ) {
       const newMessage: BrowserMessage = {
-        type: "NEW",
+        type: "ticklabvn.tpulse.NEW_VIDEO",
       };
       browser.tabs.sendMessage(tabId, newMessage);
     }
@@ -69,11 +69,12 @@ function watch() {
    * @description get message from contentScript and handle
    */
   browser.runtime.onMessage.addListener((request, sender) => {
-    if ((request.type = "UPDATE_VIDEO_STATUS")) {
+    if ((request.type = "ticklabvn.tpulse.UPDATE_VIDEO_STATUS")) {
       const tabId = sender?.tab?.id;
       const message: BinaryMessage = {
         type: "VideoStatus",
-        value: { ...request.videoStatus, tabId },
+        tabId,
+        ...request.payload,
       };
       port.postMessage(message);
     }
