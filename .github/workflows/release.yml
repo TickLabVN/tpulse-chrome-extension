@@ -45,7 +45,7 @@ jobs:
       - name: Build
         run: |
           cargo build --release --manifest-path src-proxy/Cargo.toml
-          ls -l src-proxy/release
+          ls -l src-proxy/target/release
 
   # release:
   #   name: Release
