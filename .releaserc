@@ -19,8 +19,24 @@
             "label": "Prebuilt binaries"
           },
           {
-            "path": "tpulse-chrome-extension.zip",
-            "label": "Extension ZIP file"
+            "path": "binaries/tpulse-proxy_linux",
+            "label": "tpulse-proxy_linux_${nextRelease.gitTag}",
+            "name": "tpulse-proxy_linux_${nextRelease.gitTag}"
+          },
+          {
+            "path": "binaries/tpulse-proxy_mac",
+            "label": "tpulse-proxy_mac_${nextRelease.gitTag}",
+            "name": "tpulse-proxy_mac_${nextRelease.gitTag}"
+          },
+          {
+            "path": "binaries/tpulse-proxy_windows.exe",
+            "label": "tpulse-proxy_windows_${nextRelease.gitTag}.exe",
+            "name": "tpulse-proxy_windows_${nextRelease.gitTag}.exe"
+          },
+          {
+            "path": "tpulse-browser-extension.zip",
+            "label": "tpulse-browser-extension_${nextRelease.gitTag}.zip",
+            "name": "tpulse-browser-extension_${nextRelease.gitTag}.zip"
           }
         ]
       }
