@@ -26,13 +26,25 @@ jobs:
         run: yarn
       
       - name: Build
-        run: yarn build # Outputs to dist/
-
+        id: extension-build
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | awk -F/ '{print $2}')
+          echo "REPO_NAME=${REPO_NAME}" >> $GITHUB_OUTPUT
+          yarn build
+        
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.extension-build.outputs.REPO_NAME }}
+          path: dist
+          compression-level: 9 # maximum compression
+        
   build-proxy:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    env:
+      BINARY_BASE_NAME: tpulse-proxy
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -43,21 +55,45 @@ jobs:
           toolchain: stable
 
       - name: Build
+        id: build-proxy
         run: |
           cargo build --release --manifest-path src-proxy/Cargo.toml
-          ls -l src-proxy/target/release
 
-  # release:
-  #   name: Release
-  #   needs: [build-extension]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 0
-  #         persist-credentials: false
+          OS_NAME=$(echo "${{ matrix.os }}" | awk -F- '{print $1}')
+          BINARY_NAME="${{ env.BINARY_BASE_NAME }}-$OS_NAME"
+          SOURCE_BINARY_PATH="proxy"
 
+          if [ "$OS_NAME" = "windows" ]; then
+            SOURCE_BINARY_PATH="$SOURCE_BINARY_PATH.exe"
+            BINARY_NAME="$BINARY_NAME.exe"
+          fi
+
+          echo "BINARY_NAME=${BINARY_NAME}" >> $GITHUB_OUTPUT
+          echo "SOURCE_BINARY_PATH=${SOURCE_BINARY_PATH}" >> $GITHUB_OUTPUT
+      
+      - if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.build-proxy.outputs.BINARY_NAME }}
+          path: src-proxy/target/release/${{ steps.build-proxy.outputs.SOURCE_BINARY_PATH }}
+          compression-level: 9 # maximum compression
+
+  release:
+    name: Release
+    needs: [build-extension, build-proxy]
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Checkout
+      #   uses: actions/checkout@v3
+      #   with:
+      #     fetch-depth: 0
+      #     persist-credentials: false
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        
+      - name: Display structure of downloaded files
+        run: ls -R
   #     - name: Setup Node.js
   #       uses: actions/setup-node@v3
   #       with:
