@@ -13,6 +13,8 @@ permissions:
 jobs:
   build-extension:
     runs-on: ubuntu-latest
+    outputs:
+      REPO_NAME: ${{ steps.extension-build.outputs.REPO_NAME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -83,7 +85,7 @@ jobs:
       - if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
         uses: actions/upload-artifact@v4
         with:
-          name: tpulse-proxy-${{ steps.build-proxy-unix.outputs.DISTRO }}
+          name: ${{ steps.build-proxy-unix.outputs.DISTRO }}
           path: ${{ steps.build-proxy-unix.outputs.BINARY_NAME }}
           retention-days: 1
           compression-level: 0
@@ -106,7 +108,7 @@ jobs:
       - if: ${{ matrix.os == 'windows-latest' }}
         uses: actions/upload-artifact@v4
         with:
-          name: tpulse-proxy-windows
+          name: windows
           retention-days: 1
           path: ${{ steps.build-proxy-windows.outputs.BINARY_NAME }}
           compression-level: 0
@@ -134,15 +136,15 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
 
-      - name: Unzip artifacts
+      - name: Zip browser extension
+        env:
+          REPO_NAME: ${{ needs.build-extension.outputs.REPO_NAME }}
         run: |
-          ls -l .  # Check file permissions and names
-          unzip tpulse-proxy-linux -d binaries
-          # unzip mac -d binaries
-          # unzip windows -d binaries
-          ls -l binaries # Check file permissions and names
+          mkdir -p binaries
+          mv linux/* mac/* windows/* binaries
+          zip -r ${{ env.REPO_NAME }}.zip ${{ env.REPO_NAME }}
 
-      # - name: Release
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-      #   run: yarn semantic-release
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: yarn semantic-release
