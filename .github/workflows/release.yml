@@ -136,7 +136,7 @@ jobs:
       - name: Unzip artifacts
         run: |
           ls . | grep '.zip'
-          unzip ${pwd)/linux.zip
+          unzip $(pwd)/linux.zip
           # unzip ./mac.zip
           # unzip ./windows.zip
           rm -f *.zip *.zip *.zip
