@@ -98,7 +98,7 @@ jobs:
           ls src-proxy/target/$BUILD_TARGET/release
 
           $BINARY_NAME = "${{ env.BINARY_BASE_NAME }}_windows.exe"
-          Copy-Item -Path "src-proxy\target\$BUILD_TARGET\release\proxy" -Destination $BINARY_NAME
+          Copy-Item -Path "src-proxy\target\$BUILD_TARGET\release\proxy.exe" -Destination $BINARY_NAME
 
           echo "BINARY_NAME=$BINARY_NAME" >> $env:GITHUB_OUTPUT
 
