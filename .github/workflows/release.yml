@@ -135,13 +135,12 @@ jobs:
 
       - name: Unzip artifacts
         run: |
-          pwd && (ls . | grep '.zip')
-          pwd
-          unzip ./linux.zip
+          ls . | grep '.zip'
+          unzip ${pwd)/linux.zip
           # unzip ./mac.zip
           # unzip ./windows.zip
-          # rm -f linux.zip mac.zip windows.zip
-          # ls -lh
+          rm -f *.zip *.zip *.zip
+          ls -lh
 
       # - name: Release
       #   env:
