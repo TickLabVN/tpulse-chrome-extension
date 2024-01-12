@@ -31,11 +31,12 @@ jobs:
           REPO_NAME=$(echo "${{ github.repository }}" | awk -F/ '{print $2}')
           echo "REPO_NAME=${REPO_NAME}" >> $GITHUB_OUTPUT
           yarn build
-        
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.extension-build.outputs.REPO_NAME }}
           path: dist
+          retention-days: 1
           compression-level: 9 # maximum compression
         
   build-proxy:
@@ -54,74 +55,96 @@ jobs:
         with:
           rust-version: stable
 
-      - name: Build on ${{ matrix.os }}
+      - name: Build on Unix systems
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
         id: build-proxy-unix
         run: |
-          cargo build --release --manifest-path src-proxy/Cargo.toml
-
           OS_NAME=$(echo "${{ matrix.os }}" | awk -F- '{print $1}')
-          BINARY_NAME="${{ env.BINARY_BASE_NAME }}-$OS_NAME"
-          SOURCE_BINARY_NAME="proxy"
+          
+          if [ $OS_NAME == "ubuntu" ]; then
+            DISTRO="linux"
+            BUILD_TARGET="x86_64-unknown-linux-musl"
+          elif [ $OS_NAME == "macos" ]; then
+            DISTRO="mac"
+            BUILD_TARGET="x86_64-apple-darwin"
+          fi
+
+          rustup target add $BUILD_TARGET
+          cargo build --release --target=$BUILD_TARGET --manifest-path src-proxy/Cargo.toml
+          ls src-proxy/target/release/$BUILD_TARGET
+
+          BINARY_NAME="${{ env.BINARY_BASE_NAME }}_$DISTRO"
+          cp src-proxy/target/$BUILD_TARGET/release/proxy $BINARY_NAME
 
           echo "BINARY_NAME=${BINARY_NAME}" >> $GITHUB_OUTPUT
-          echo "SOURCE_BINARY_NAME=${SOURCE_BINARY_NAME}" >> $GITHUB_OUTPUT
-      
+          echo "DISTRO=${DISTRO}" >> $GITHUB_OUTPUT
+          
       - if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.build-proxy-unix.outputs.BINARY_NAME }}
-          path: src-proxy/target/release/${{ steps.build-proxy-unix.outputs.SOURCE_BINARY_NAME }}
-          compression-level: 9 # maximum compression
+          name: ${{ steps.build-proxy-unix.outputs.DISTRO }}
+          path: ${{ steps.build-proxy-unix.outputs.BINARY_NAME }}
+          retention-days: 1
+          compression-level: 0
 
-      - name: Build on ${{ matrix.os }}
+      - name: Build on Windows
         id: build-proxy-windows
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
-          cargo build --release --manifest-path src-proxy/Cargo.toml
-          ls src-proxy/target/release
+          $BUILD_TARGET = "x86_64-pc-windows-msvc"
+          rustup target add $BUILD_TARGET
+          
+          cargo build --release --target=$BUILD_TARGET --manifest-path src-proxy/Cargo.toml
+          ls src-proxy/target/release/$BUILD_TARGET
 
-          $OS_NAME = (echo "${{ matrix.os }}").Split("-")[0]
-          $BINARY_NAME = "${{ env.BINARY_BASE_NAME }}-$OS_NAME.exe"
-          $SOURCE_BINARY_NAME = "proxy.exe"
+          $BINARY_NAME = "${{ env.BINARY_BASE_NAME }}_windows.exe"
+          Copy-Item -Path "src-proxy\target\$BUILD_TARGET\release\proxy" -Destination $BINARY_NAME
 
           echo "BINARY_NAME=$BINARY_NAME" >> $env:GITHUB_OUTPUT
-          echo "SOURCE_BINARY_NAME=$SOURCE_BINARY_NAME" >> $env:GITHUB_OUTPUT
 
       - if: ${{ matrix.os == 'windows-latest' }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.build-proxy-windows.outputs.BINARY_NAME }}
-          path: src-proxy/target/release/${{ steps.build-proxy-windows.outputs.SOURCE_BINARY_NAME }}
-          compression-level: 0 # Upload raw binary
+          name: windows
+          retention-days: 1
+          path: ${{ steps.build-proxy-windows.outputs.BINARY_NAME }}
+          compression-level: 0
 
   release:
     name: Release
     needs: [build-extension, build-proxy]
     runs-on: ubuntu-latest
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-      #   with:
-      #     fetch-depth: 0
-      #     persist-credentials: false
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn add -D semantic-release @semantic-release/changelog @semantic-release/git
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        
-      - name: Display structure of downloaded files
-        run: ls -R
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 20.x
-  #         cache: "yarn"
+      - name: Unzip artifacts
+        run: |
+          unzip -q -o linux.zip
+          unzip -q -o mac.zip
+          unzip -q -o windows.zip
+          rm -f linux.zip mac.zip windows.zip
+          ls -lh
 
-  #     - name: Install dependencies
-  #       run: yarn add -D semantic-release @semantic-release/changelog @semantic-release/git
+      # - name: Release
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      #   run: yarn semantic-release
 
-  #     - name: Release
-  #       run:
-  #         yarn semantic-release
+
   
