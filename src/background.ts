@@ -1,12 +1,5 @@
 import browser from "webextension-polyfill";
 
-type ChromeTab = {
-  title: string;
-  url: string;
-  windowId: number;
-  time: number;
-};
-
 const APP_NAME = "com.ticklab.tpulse";
 const port = browser.runtime.connectNative(APP_NAME);
 
@@ -22,6 +15,7 @@ function getTabDetails(tabId: number): Promise<ChromeTab> {
           url: url || "",
           windowId: windowId || 0,
           time: unixTs,
+          tabId,
         };
         resolve(tabDetails);
       })
@@ -34,20 +28,22 @@ function getTabDetails(tabId: number): Promise<ChromeTab> {
 function watch() {
   browser.tabs.onActivated.addListener(function (activeInfo) {
     const tabId = activeInfo.tabId;
-    //TODO: remove this
-    console.log("tabs.onActivated");
     getTabDetails(tabId)
-      .then((tab) => port.postMessage(tab))
+      .then((tab) => {
+        const message: BinaryMessage = { type: "ChromeTab", value: tab };
+        port.postMessage(message);
+      })
       .catch((error) => console.error("Error getting tab information:", error));
   });
   browser.webNavigation.onCommitted.addListener(function (details) {
     // Check if the navigation is to the main frame
     if (details.frameId === 0) {
       const tabId = details.tabId;
-      //TODO: remove this
-      console.log("webNavigation.onCommitted");
       getTabDetails(tabId)
-        .then((tab) => console.log(tab)) //port.postMessage(tab))
+        .then((tab) => {
+          const message: BinaryMessage = { type: "ChromeTab", value: tab };
+          port.postMessage(message);
+        })
         .catch((error) =>
           console.error("Error getting tab information:", error)
         );
@@ -63,7 +59,7 @@ function watch() {
       tab.url &&
       tab.url.startsWith("http")
     ) {
-      const newMessage: Message = {
+      const newMessage: BrowserMessage = {
         type: "NEW",
       };
       browser.tabs.sendMessage(tabId, newMessage);
@@ -72,10 +68,15 @@ function watch() {
   /**
    * @description get message from contentScript and handle
    */
-  browser.runtime.onMessage.addListener((request) => {
-    if ((request.type = "UPDATE_VIDEO_STATUS"))
-      //TODO: implement multiprocessing communication send data to eventEmitter
-      console.log(request.videoStatus);
+  browser.runtime.onMessage.addListener((request, sender) => {
+    if ((request.type = "UPDATE_VIDEO_STATUS")) {
+      const tabId = sender?.tab?.id;
+      const message: BinaryMessage = {
+        type: "VideoStatus",
+        value: { ...request.videoStatus, tabId },
+      };
+      port.postMessage(message);
+    }
   });
 }
 

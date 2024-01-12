@@ -17,7 +17,7 @@ const updateStatus = (event: Event) => {
     try {
       browser.runtime.sendMessage({ type: "UPDATE_VIDEO_STATUS", videoStatus });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 
@@ -34,7 +34,7 @@ const updateStatus = (event: Event) => {
   try {
     browser.runtime.sendMessage({ type: "UPDATE_VIDEO_STATUS", videoStatus });
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };
 
@@ -51,7 +51,7 @@ const setupPlayerEventListeners = () => {
 
       if (videoStatus.paused && !videoPlayer.paused) {
         videoStatus.paused = false;
-        videoStatus.startTime = undefined;
+        videoStatus.startTime = Math.floor(Date.now() / 1000);
       }
     }
 
@@ -63,7 +63,7 @@ const setupPlayerEventListeners = () => {
     try {
       browser.runtime.sendMessage({ type: "UPDATE_VIDEO_STATUS", videoStatus });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 };

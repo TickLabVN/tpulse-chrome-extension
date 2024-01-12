@@ -9,7 +9,6 @@
     "build": "vite build"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.256",
     "@types/webextension-polyfill": "^0.10.0",
     "typescript": "^5.3.2",
     "vite": "^5.0.0",
