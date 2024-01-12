@@ -62,21 +62,16 @@ jobs:
 
           OS_NAME=$(echo "${{ matrix.os }}" | awk -F- '{print $1}')
           BINARY_NAME="${{ env.BINARY_BASE_NAME }}-$OS_NAME"
-          SOURCE_BINARY_PATH="proxy"
-
-          if [ "$OS_NAME" = "windows" ]; then
-            SOURCE_BINARY_PATH="$SOURCE_BINARY_PATH.exe"
-            BINARY_NAME="$BINARY_NAME.exe"
-          fi
+          SOURCE_BINARY_NAME="proxy"
 
           echo "BINARY_NAME=${BINARY_NAME}" >> $GITHUB_OUTPUT
-          echo "SOURCE_BINARY_PATH=${SOURCE_BINARY_PATH}" >> $GITHUB_OUTPUT
+          echo "SOURCE_BINARY_NAME=${SOURCE_BINARY_NAME}" >> $GITHUB_OUTPUT
       
       - if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.build-proxy-unix.outputs.BINARY_NAME }}
-          path: src-proxy/target/release/${{ steps.build-proxy-unix.outputs.SOURCE_BINARY_PATH }}
+          path: src-proxy/target/release/${{ steps.build-proxy-unix.outputs.SOURCE_BINARY_NAME }}
           compression-level: 9 # maximum compression
 
       - name: Build on ${{ matrix.os }}
@@ -86,23 +81,20 @@ jobs:
           cargo build --release --manifest-path src-proxy/Cargo.toml
 
           $OS_NAME = (echo "${{ matrix.os }}").Split("-")[0]
-          $BINARY_NAME = "${{ env.BINARY_BASE_NAME }}-$OS_NAME"
-          $SOURCE_BINARY_PATH = "proxy"
-
-          if ($OS_NAME -eq "windows") {
-            $SOURCE_BINARY_PATH += ".exe"
-            $BINARY_NAME += ".exe"
-          }
+          $BINARY_NAME = "${{ env.BINARY_BASE_NAME }}-$OS_NAME.exe"
+          $SOURCE_BINARY_NAME = "proxy.exe"
 
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_OUTPUT
-          echo "SOURCE_BINARY_PATH=$SOURCE_BINARY_PATH" >> $GITHUB_OUTPUT
+          echo "SOURCE_BINARY_NAME=$SOURCE_BINARY_NAME" >> $GITHUB_OUTPUT
+
+          echo $GITHUB_OUTPUT
 
       - if: ${{ matrix.os == 'windows-latest' }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.build-proxy-windows.outputs.BINARY_NAME }}
-          path: src-proxy/target/release/${{ steps.build-proxy-windows.outputs.SOURCE_BINARY_PATH }}
-          compression-level: 9 # maximum compression
+          path: src-proxy/target/release/${{ steps.build-proxy-windows.outputs.SOURCE_BINARY_NAME }}
+          compression-level: 0 # Upload raw binary
 
   release:
     name: Release
