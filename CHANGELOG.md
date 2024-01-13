@@ -1,3 +1,10 @@
+# [1.0.0-beta.3](https://github.com/TickLabVN/tpulse-browser-extension/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2024-01-13)
+
+
+### Bug Fixes
+
+* **collect metrics:** ignore tabs that don't start with `http://` or `https://` ([b1da2ac](https://github.com/TickLabVN/tpulse-browser-extension/commit/b1da2ac0b3bc6b03264d1f7a038a722d64eb5251))
+
 # [1.0.0-beta.2](https://github.com/TickLabVN/tpulse-browser-extension/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2024-01-12)
 
 
