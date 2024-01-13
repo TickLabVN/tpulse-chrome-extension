@@ -1,6 +1,6 @@
 type VideoStatus = {
   paused: boolean;
-  startTime?: Time;
+  startTime?: number;
 };
 
 /**
@@ -8,11 +8,9 @@ type VideoStatus = {
  */
 type MessageTypePrefix = "ticklabvn.tpulse.";
 
-type VideoStatusPayload = Record<string, string | number | boolean>;
-
 type BrowserMessage = {
   type: `${MessageTypePrefix}${"TAB_UPDATE" | "UPDATE_VIDEO_STATUS"}`;
-  payload?: VideoStatusPayload;
+  payload?: VideoStatus;
 };
 
 type BrowserTab = {
@@ -23,7 +21,7 @@ type BrowserTab = {
   tabId?: number;
 };
 
-type VideoStatusPayloadWithTabId = VideoStatusPayload & { tabId?: number };
-type BinaryMessage = (VideoStatusPayloadWithTabId | BrowserTab) & {
+type VideoStatusWithTabId = VideoStatus & { tabId?: number };
+type BinaryMessage = (VideoStatusWithTabId | BrowserTab) & {
   type: "BrowserTab" | "VideoStatus";
 };
