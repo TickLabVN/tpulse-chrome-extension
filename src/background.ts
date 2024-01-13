@@ -3,14 +3,21 @@ import browser from "webextension-polyfill";
 const APP_NAME = "com.ticklab.tpulse";
 const port = browser.runtime.connectNative(APP_NAME);
 
-function getTabDetails(tabId: number): Promise<ChromeTab> {
+function isUserTab(tab: BrowserTab) {
+  return tab.url && (
+    tab.url.startsWith("http://")
+    || tab.url.startsWith("https://")
+  );
+}
+
+function getTabDetails(tabId: number): Promise<BrowserTab> {
   return new Promise((resolve, reject) => {
     browser.tabs
       .get(tabId)
       .then((tab) => {
         const { title, url, windowId } = tab;
         const unixTs = Math.floor(Date.now() / 1000);
-        const tabDetails: ChromeTab = {
+        const tabDetails: BrowserTab = {
           title: title || "",
           url: url || "",
           windowId: windowId || 0,
@@ -30,7 +37,9 @@ function watch() {
     const tabId = activeInfo.tabId;
     getTabDetails(tabId)
       .then((tab) => {
-        const message: BinaryMessage = { type: "ChromeTab", ...tab };
+        if (!isUserTab(tab)) return;
+        console.log("tab", tab);
+        const message: BinaryMessage = { type: "BrowserTab", ...tab };
         port.postMessage(message);
       })
       .catch((error) => console.error("Error getting tab information:", error));
@@ -41,7 +50,8 @@ function watch() {
       const tabId = details.tabId;
       getTabDetails(tabId)
         .then((tab) => {
-          const message: BinaryMessage = { type: "ChromeTab", ...tab };
+          if (!isUserTab(tab)) return;
+          const message: BinaryMessage = { type: "BrowserTab", ...tab };
           port.postMessage(message);
         })
         .catch((error) =>
