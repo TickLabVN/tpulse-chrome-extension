@@ -83,7 +83,7 @@ const setupPlayerEventListeners = () => {
 browser.runtime.onMessage.addListener((obj) => {
   const { type } = obj;
 
-  if (type === "ticklabvn.tpulse.NEW_VIDEO") {
+  if (type === "ticklabvn.tpulse.TAB_UPDATE") {
     setupPlayerEventListeners();
   }
 });

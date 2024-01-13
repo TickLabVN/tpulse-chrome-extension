@@ -4,9 +4,8 @@ const APP_NAME = "com.ticklab.tpulse";
 const port = browser.runtime.connectNative(APP_NAME);
 
 function isUserTab(tab: BrowserTab) {
-  return tab.url && (
-    tab.url.startsWith("http://")
-    || tab.url.startsWith("https://")
+  return (
+    tab.url && (tab.url.startsWith("http://") || tab.url.startsWith("https://"))
   );
 }
 
@@ -38,7 +37,6 @@ function watch() {
     getTabDetails(tabId)
       .then((tab) => {
         if (!isUserTab(tab)) return;
-        console.log("tab", tab);
         const message: BinaryMessage = { type: "BrowserTab", ...tab };
         port.postMessage(message);
       })
@@ -70,7 +68,7 @@ function watch() {
       tab.url.startsWith("http")
     ) {
       const newMessage: BrowserMessage = {
-        type: "ticklabvn.tpulse.NEW_VIDEO",
+        type: "ticklabvn.tpulse.TAB_UPDATE",
       };
       browser.tabs.sendMessage(tabId, newMessage);
     }

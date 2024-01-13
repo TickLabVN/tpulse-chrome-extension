@@ -11,7 +11,7 @@ type MessageTypePrefix = "ticklabvn.tpulse.";
 type VideoStatusPayload = Record<string, string | number | boolean>;
 
 type BrowserMessage = {
-  type: `${MessageTypePrefix}${"NEW_VIDEO" | "UPDATE_VIDEO_STATUS"}`;
+  type: `${MessageTypePrefix}${"TAB_UPDATE" | "UPDATE_VIDEO_STATUS"}`;
   payload?: VideoStatusPayload;
 };
 
