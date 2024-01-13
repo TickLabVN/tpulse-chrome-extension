@@ -15,7 +15,7 @@ type BrowserMessage = {
   payload?: VideoStatusPayload;
 };
 
-type ChromeTab = {
+type BrowserTab = {
   title: string;
   url: string;
   windowId: number;
@@ -24,6 +24,6 @@ type ChromeTab = {
 };
 
 type VideoStatusPayloadWithTabId = VideoStatusPayload & { tabId?: number };
-type BinaryMessage = (VideoStatusPayloadWithTabId | ChromeTab) & {
-  type: "ChromeTab" | "VideoStatus";
+type BinaryMessage = (VideoStatusPayloadWithTabId | BrowserTab) & {
+  type: "BrowserTab" | "VideoStatus";
 };
