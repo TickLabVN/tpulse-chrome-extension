@@ -13,6 +13,9 @@ function generateManifest() {
 }
 
 export default defineConfig({
+  build: {
+    sourcemap: true
+  },
   plugins: [
     webExtension({
       manifest: generateManifest,
