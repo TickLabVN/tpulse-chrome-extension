@@ -73,6 +73,13 @@ Ensure that the following software is installed on your system:
         "type": "stdio",
         "allowed_origins": ["chrome-extension://<ID-of-extension-in-step-2>/"]
     }
+    {
+    "name": "com.ticklab.tpulse",
+    "description": "tpulse",
+    "path": "/home/tan17112003/Downloads/tpulse-browser-extension/src-proxy/target/release/proxy",
+    "type": "stdio",
+    "allowed_origins": ["chrome-extension://pojkmmeinbjgbcaijmapghgmbebmjgjg/"]
+    }   
     ```
 
 3. Save and close the file.
