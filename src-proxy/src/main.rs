@@ -1,5 +1,6 @@
 use std::fmt;
 use std::io::{self, Read, Write};
+use ipipe::Pipe;
 
 enum Error {
     Io(io::Error),
@@ -35,9 +36,15 @@ fn read_input<R: Read>(mut input: R) -> Result<String, Error> {
 }
 
 fn main() {
+    let mut pipe = Pipe::with_name("tpulse_pipe").expect("Could not create named pipe for tpulse application");
     loop {
         match read_input(io::stdin()) {
-            Ok(value) => io::stderr().write_all(value.as_bytes()).unwrap(),
+            Ok(value) => 
+            {
+                let payload = value.to_string();
+                writeln!(&mut pipe, "{}", payload).expect("Could not write data into the pipe to send");
+                io::stderr().write_all(value.as_bytes()).unwrap()
+            },
             Err(e) => {
                 if let Error::NoMoreInput = e {
                     break;
