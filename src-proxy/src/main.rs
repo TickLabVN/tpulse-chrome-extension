@@ -1,19 +1,9 @@
 use std::fmt;
 use std::io::{self, Read, Write};
-use std::ffi::CString;
 
-#[cfg(target_os = "linux")]
-use libc::{open, write, O_WRONLY, close};
-#[cfg(target_os = "windows")]
-use {
-    std::ptr,
-    winapi::um::fileapi::{CreateFileW, OPEN_EXISTING},
-    winapi::um::winbase::{FILE_FLAG_OVERLAPPED, PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE, PIPE_READMODE_MESSAGE},
-    winapi::um::winnt::{GENERIC_READ, GENERIC_WRITE, FILE_SHARE_READ, FILE_SHARE_WRITE},
-    winapi::um::handleapi::INVALID_HANDLE_VALUE,
-    winapi::um::ioapiset::WriteFile,
-    winapi::um::namedpipeapi::CreateNamedPipeW,
-};
+mod metrics;
+use metrics::handle_metrics;
+
 
 enum Error {
     Io(io::Error),
@@ -28,27 +18,7 @@ impl fmt::Display for Error {
         }
     }
 }
-#[cfg(target_os = "linux")]
-fn write_to_pipe(pipe_name: &str, data: &str) -> Result<(), Error> {
-    let c_pipe_name = CString::new(pipe_name).expect("Failed to convert pipe name to CString");
 
-    let fd = unsafe { open(c_pipe_name.as_ptr(), O_WRONLY) };
-
-    if fd == -1 {
-        return Err(Error::NoMoreInput);
-    }
-
-    let result = unsafe { write(fd, data.as_ptr() as *const std::ffi::c_void, data.len()) };
-
-    unsafe {
-        close(fd);
-    }
-
-    if result == -1 {
-        return Err(Error::NoMoreInput);
-    }
-    Ok(())
-}
 #[cfg(target_os = "windows")]
 fn write_to_pipe(pipe_name: &str, data: &str) -> io::Result<()> {
     let pipe_name = CString::new(pipe_name).expect("Failed to convert pipe name to CString");
@@ -102,15 +72,18 @@ fn read_input<R: Read>(mut input: R) -> Result<String, Error> {
 }
 
 fn main() {
-    let path = "/tmp/tpulse-test13";
+    #[cfg(target_os = "linux")]
+    let path = "/tmp/tpulse";
+    #[cfg(target_os = "windows")]
+    let pipe_name = "\\\\.\\pipe\\tpulse";
     loop {
         match read_input(io::stdin()) {
             Ok(value) => 
             {
                 let payload = value.to_string();
-                match write_to_pipe(&path, &payload) {
-                    Ok(_) => eprintln!("Send successfully"),
-                    Err(_) => eprintln!("Fail to send data to server")
+                match handle_metrics(&path, &payload) {
+                    Ok(()) => eprintln!("Send data successfully"),
+                    Err(err) => eprintln!("Fail to send data due to: {}", err)
                 }
                 io::stderr().write_all(value.as_bytes()).unwrap();
             },
@@ -123,4 +96,6 @@ fn main() {
         }
     }
 }
+
+
 
