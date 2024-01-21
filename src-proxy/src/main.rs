@@ -38,16 +38,13 @@ fn read_input<R: Read>(mut input: R) -> Result<String, Error> {
         },
     }
 }
-fn print_type_of<T>(_: &T) {
-    println!("{}", std::any::type_name::<T>())
-}
+
 fn main() {
     #[cfg(any(target_os = "linux", target = "macos"))]
-    let path = "/tmp/tpulse";
+    let path = "/tmp/tpulsetantan";
     #[cfg(target_os = "windows")]
     let pipe_name = "\\\\.\\pipe\\tpulse";
     loop {
-        let mut pipe = unix_named_pipe::open_write(pipe_path).expect("could not open pipe for writing");
         match read_input(io::stdin()) {
             Ok(value) => 
             {
