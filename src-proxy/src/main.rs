@@ -73,15 +73,14 @@ fn read_input<R: Read>(mut input: R) -> Result<String, Error> {
 
 fn main() {
     #[cfg(target_os = "linux")]
-    let path = "/tmp/tpulse";
+    let path = "/tmp/tpulseaaa";
     #[cfg(target_os = "windows")]
     let pipe_name = "\\\\.\\pipe\\tpulse";
     loop {
         match read_input(io::stdin()) {
             Ok(value) => 
             {
-                let payload = value.to_string();
-                match handle_metrics(&path, &payload) {
+                match handle_metrics(&path, &value) {
                     Ok(()) => eprintln!("Send data successfully"),
                     Err(err) => eprintln!("Fail to send data due to: {}", err)
                 }
