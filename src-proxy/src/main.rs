@@ -41,9 +41,9 @@ fn read_input<R: Read>(mut input: R) -> Result<String, Error> {
 
 fn main() {
     #[cfg(any(target_os = "linux", target = "macos"))]
-    let path = "/tmp/tpulsetantan";
+    let path = "/tmp/tpulse";
     #[cfg(target_os = "windows")]
-    let pipe_name = "\\\\.\\pipe\\tpulse";
+    let path = "\\\\.\\pipe\\tpulse";
     loop {
         match read_input(io::stdin()) {
             Ok(value) => 
