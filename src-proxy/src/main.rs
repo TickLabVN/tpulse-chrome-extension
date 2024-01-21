@@ -72,8 +72,8 @@ fn read_input<R: Read>(mut input: R) -> Result<String, Error> {
 }
 
 fn main() {
-    #[cfg(target_os = "linux")]
-    let path = "/tmp/tpulseaaa";
+    #[cfg(any(target_os = "linux", target = "macos"))]
+    let path = "/tmp/tpulse";
     #[cfg(target_os = "windows")]
     let pipe_name = "\\\\.\\pipe\\tpulse";
     loop {
