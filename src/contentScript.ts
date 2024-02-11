@@ -1,28 +1,30 @@
+import moment from "moment";
 import browser from "webextension-polyfill";
 
-let videoPlayers: HTMLCollectionOf<HTMLVideoElement>;
+let videoPlayers: HTMLCollectionOf<HTMLVideoElement> | null = null;
 
 const videoStatus: VideoStatus = {
+  // User is watching video or not
   paused: true,
 };
 
 const updateStatus = (event: Event) => {
   if (!videoPlayers) return;
-  const updatingStatus = event.type;
-  if (!videoStatus.paused && updatingStatus === "play") return;
-  if (videoStatus.paused && updatingStatus === "play") {
+
+  if (event.type === "play") {
+    // User is already watching video
+    if (!videoStatus.paused) return;
+
+    // Otherwise, update status
     videoStatus.paused = false;
-    videoStatus.startTime = Math.floor(Date.now() / 1000);
+    videoStatus.startTime = moment().unix();
+
+    const message: BrowserMessage = {
+      type: "ticklabvn.tpulse.UPDATE_VIDEO_STATUS",
+      payload: videoStatus,
+    };
     //send data to background
-    try {
-      const message: BrowserMessage = {
-        type: "ticklabvn.tpulse.UPDATE_VIDEO_STATUS",
-        payload: videoStatus,
-      };
-      browser.runtime.sendMessage(message);
-    } catch (e) {
-      console.error(e);
-    }
+    browser.runtime.sendMessage(message);
   }
 
   //only stop left
@@ -33,57 +35,42 @@ const updateStatus = (event: Event) => {
 
   //all video stopped
   videoStatus.paused = true;
-  videoStatus.startTime = Math.floor(Date.now() / 1000);
+  videoStatus.startTime = moment().unix();
+
   //send data to background
-  try {
-    const message: BrowserMessage = {
-      type: "ticklabvn.tpulse.UPDATE_VIDEO_STATUS",
-      payload: videoStatus,
-    };
-    browser.runtime.sendMessage(message);
-  } catch (e) {
-    console.error(e);
-  }
+  const message: BrowserMessage = {
+    type: "ticklabvn.tpulse.UPDATE_VIDEO_STATUS",
+    payload: videoStatus,
+  };
+  browser.runtime.sendMessage(message);
 };
 
 /**
  * @description Initial value for videoStatus. Adding pause, play event listener to each videos in page.
  */
-const setupPlayerEventListeners = () => {
+export function executeContentScript() {
   videoPlayers = document.getElementsByTagName("video");
-  if (videoPlayers.length > 0) {
-    for (let i = 0; i < videoPlayers.length; i++) {
-      const videoPlayer = videoPlayers[i];
-      videoPlayer.addEventListener("pause", updateStatus);
-      videoPlayer.addEventListener("play", updateStatus);
+  if (videoPlayers.length === 0) return;
 
-      if (videoStatus.paused && !videoPlayer.paused) {
-        videoStatus.paused = false;
-        videoStatus.startTime = Math.floor(Date.now() / 1000);
-      }
-    }
+  for (let i = 0; i < videoPlayers.length; i++) {
+    const videoPlayer = videoPlayers[i];
+    videoPlayer.addEventListener("pause", updateStatus);
+    videoPlayer.addEventListener("play", updateStatus);
 
-    if (videoStatus.paused) {
-      videoStatus.startTime = Math.floor(Date.now() / 1000);
-    }
-
-    //send data to background
-    try {
-      const message: BrowserMessage = {
-        type: "ticklabvn.tpulse.UPDATE_VIDEO_STATUS",
-        payload: videoStatus,
-      };
-      browser.runtime.sendMessage(message);
-    } catch (e) {
-      console.error(e);
+    if (videoStatus.paused && !videoPlayer.paused) {
+      videoStatus.paused = false;
+      videoStatus.startTime = moment().unix();
     }
   }
+
+  if (videoStatus.paused) {
+    videoStatus.startTime = moment().unix();
+  }
+
+  //send data to background
+  const message: BrowserMessage = {
+    type: "ticklabvn.tpulse.UPDATE_VIDEO_STATUS",
+    payload: videoStatus,
+  };
+  browser.runtime.sendMessage(message);
 };
-
-browser.runtime.onMessage.addListener((obj) => {
-  const { type } = obj;
-
-  if (type === "ticklabvn.tpulse.TAB_UPDATE") {
-    setupPlayerEventListeners();
-  }
-});

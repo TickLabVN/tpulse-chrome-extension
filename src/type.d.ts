@@ -9,7 +9,7 @@ type VideoStatus = {
 type MessageTypePrefix = "ticklabvn.tpulse.";
 
 type BrowserMessage = {
-  type: `${MessageTypePrefix}${"TAB_UPDATE" | "UPDATE_VIDEO_STATUS"}`;
+  type: `${MessageTypePrefix}${"UPDATE_VIDEO_STATUS"}`;
   payload?: VideoStatus;
 };
 
@@ -19,9 +19,4 @@ type BrowserTab = {
   windowId: number;
   time: number;
   tabId?: number;
-};
-
-type VideoStatusWithTabId = VideoStatus & { tabId?: number };
-type BinaryMessage = (VideoStatusWithTabId | BrowserTab) & {
-  type: "BrowserTab" | "VideoStatus";
 };
