@@ -1,8 +1,7 @@
-
 #[cfg(any(target_os = "linux", target = "macos"))]
-use libc::{open, write, O_WRONLY, close};
-use std::io::Error;
+use libc::{close, open, write, O_WRONLY};
 use std::ffi::CString;
+use std::io::Error;
 #[cfg(any(target_os = "linux", target = "macos"))]
 pub fn handle_metrics(pipe_name: &str, data: &str) -> Result<(), Error> {
     let c_pipe_name = CString::new(pipe_name).expect("Failed to convert pipe name to CString");
@@ -27,13 +26,13 @@ pub fn handle_metrics(pipe_name: &str, data: &str) -> Result<(), Error> {
 #[cfg(target_os = "windows")]
 use {
     std::ffi::OsStr,
+    std::io::Error,
     std::os::windows::ffi::OsStrExt,
     std::ptr,
-    std::io::Error,
     winapi::ctypes::c_void,
     winapi::um::fileapi::{CreateFileW, WriteFile, OPEN_EXISTING},
+    winapi::um::winbase::FILE_FLAG_OVERLAPPED,
     winapi::um::winnt::{FILE_SHARE_READ, GENERIC_WRITE},
-    winapi::um::winbase::FILE_FLAG_OVERLAPPED
 };
 #[cfg(target_os = "windows")]
 fn connect_to_pipe(pipe_name: &str) -> Result<i32, Error> {

@@ -4,7 +4,6 @@ use std::io::{self, Read, Write};
 mod metrics;
 use metrics::handle_metrics;
 
-
 enum Error {
     Io(io::Error),
     NoMoreInput,
@@ -18,7 +17,6 @@ impl fmt::Display for Error {
         }
     }
 }
-
 
 fn read_input<R: Read>(mut input: R) -> Result<String, Error> {
     let mut buffer_size = [0; 4];
@@ -46,14 +44,13 @@ fn main() {
     let path = "\\\\.\\pipe\\tpulse";
     loop {
         match read_input(io::stdin()) {
-            Ok(value) => 
-            {
+            Ok(value) => {
                 match handle_metrics(&path, &value) {
                     Ok(()) => eprintln!("Send data successfully"),
-                    Err(err) => eprintln!("Fail to send data due to: {}", err)
+                    Err(err) => eprintln!("Fail to send data due to: {}", err),
                 }
                 io::stderr().write_all(value.as_bytes()).unwrap();
-            },
+            }
             Err(e) => {
                 if let Error::NoMoreInput = e {
                     break;
@@ -63,6 +60,3 @@ fn main() {
         }
     }
 }
-
-
-
