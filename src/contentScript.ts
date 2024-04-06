@@ -73,4 +73,12 @@ export function executeContentScript() {
     payload: videoStatus,
   };
   browser.runtime.sendMessage(message);
-};
+}
+
+browser.runtime.onMessage.addListener((obj: BrowserMessage) => {
+  const { type } = obj;
+
+  if (type === "ticklabvn.tpulse.NEW_VIDEO") {
+    executeContentScript();
+  }
+});

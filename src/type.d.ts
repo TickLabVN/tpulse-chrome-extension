@@ -8,8 +8,10 @@ type VideoStatus = {
  */
 type MessageTypePrefix = "ticklabvn.tpulse.";
 
+type BrowserMessageType = "UPDATE_VIDEO_STATUS" | "NEW_VIDEO";
+
 type BrowserMessage = {
-  type: `${MessageTypePrefix}${"UPDATE_VIDEO_STATUS"}`;
+  type: `${MessageTypePrefix}${BrowserMessageType}`;
   payload?: VideoStatus;
 };
 
