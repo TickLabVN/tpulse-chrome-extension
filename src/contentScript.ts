@@ -48,7 +48,7 @@ const updateStatus = (event: Event) => {
 /**
  * @description Initial value for videoStatus. Adding pause, play event listener to each videos in page.
  */
-export function executeContentScript() {
+function executeContentScript() {
   videoPlayers = document.getElementsByTagName("video");
   if (videoPlayers.length === 0) return;
 

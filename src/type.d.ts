@@ -18,7 +18,5 @@ type BrowserMessage = {
 type BrowserTab = {
   title: string;
   url: string;
-  windowId: number;
   time: number;
-  tabId?: number;
 };

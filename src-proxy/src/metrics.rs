@@ -1,11 +1,10 @@
-#[cfg(any(target_os = "linux", target = "macos"))]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 use libc::{close, open, write, O_WRONLY};
 use std::ffi::CString;
 use std::io::Error;
-#[cfg(any(target_os = "linux", target = "macos"))]
-pub fn handle_metrics(pipe_name: &str, data: &str) -> Result<(), Error> {
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub fn send_metrics(pipe_name: &str, data: &str) -> Result<(), Error> {
     let c_pipe_name = CString::new(pipe_name).expect("Failed to convert pipe name to CString");
-
     let fd = unsafe { open(c_pipe_name.as_ptr(), O_WRONLY) };
 
     if fd == -1 {
@@ -13,11 +12,9 @@ pub fn handle_metrics(pipe_name: &str, data: &str) -> Result<(), Error> {
     }
 
     let result = unsafe { write(fd, data.as_ptr() as *const std::ffi::c_void, data.len()) };
-
     unsafe {
         close(fd);
     }
-
     if result == -1 {
         return Err(Error::last_os_error());
     }

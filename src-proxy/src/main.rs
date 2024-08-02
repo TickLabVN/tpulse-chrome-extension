@@ -2,7 +2,7 @@ use std::fmt;
 use std::io::{self, Read, Write};
 
 mod metrics;
-use metrics::handle_metrics;
+use metrics::send_metrics;
 
 enum Error {
     Io(io::Error),
@@ -37,15 +37,18 @@ fn read_input<R: Read>(mut input: R) -> Result<String, Error> {
     }
 }
 
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+const PIPE_PATH: &str = "/tmp/tpulse";
+
+#[cfg(target_os = "windows")]
+const PIPE_PATH: &str = "\\\\.\\pipe\\tpulse";
+
 fn main() {
-    #[cfg(any(target_os = "linux", target = "macos"))]
-    let path = "/tmp/tpulse";
-    #[cfg(target_os = "windows")]
-    let path = "\\\\.\\pipe\\tpulse";
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     loop {
         match read_input(io::stdin()) {
             Ok(value) => {
-                match handle_metrics(&path, &value) {
+                match send_metrics(PIPE_PATH, &value) {
                     Ok(()) => eprintln!("Send data successfully"),
                     Err(err) => eprintln!("Fail to send data due to: {}", err),
                 }
