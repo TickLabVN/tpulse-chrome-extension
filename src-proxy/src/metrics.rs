@@ -3,9 +3,11 @@ use libc::{close, open, write, O_WRONLY};
 use std::ffi::CString;
 use std::io::Error;
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-pub fn send_metrics(pipe_name: &str, data: &str) -> Result<(), Error> {
+pub fn send_metrics(pipe_name: &str, data: &mut String) -> Result<(), Error> {
     let c_pipe_name = CString::new(pipe_name).expect("Failed to convert pipe name to CString");
     let fd = unsafe { open(c_pipe_name.as_ptr(), O_WRONLY) };
+
+    data.push(',');
 
     if fd == -1 {
         return Err(Error::last_os_error());

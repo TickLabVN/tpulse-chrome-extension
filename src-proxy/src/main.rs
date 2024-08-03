@@ -47,8 +47,8 @@ fn main() {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     loop {
         match read_input(io::stdin()) {
-            Ok(value) => {
-                match send_metrics(PIPE_PATH, &value) {
+            Ok(mut value) => {
+                match send_metrics(PIPE_PATH, &mut value) {
                     Ok(()) => eprintln!("Send data successfully"),
                     Err(err) => eprintln!("Fail to send data due to: {}", err),
                 }
